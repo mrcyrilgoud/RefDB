@@ -101,6 +101,16 @@ root = tkinter.Tk()
 root.title("Alignment Selector")
 root.geometry('500x300')
 
+#Label and text entry for the name of the to-be-created training set
+Label(root, text="Enter the researcher number", font=('Calibri 10')).place(x=150,y=50)
+resIdEntry = Entry(root, width= 40)
+resIdEntry.place(x=75, y=75)
+
+#Label and text entry for the name of the to-be-created training set
+Label(root, text="Enter the sample ID ", font=('Calibri 10')).place(x=150,y=125)
+sidEntry = Entry(root, width= 40)
+sidEntry.place(x=75, y=150)
+
 #closes the program - destroys everything
 def close():
     root.destroy()
@@ -143,8 +153,8 @@ def submissionAl():
 
     def_line=""
     sequence = ""
-    mission = 1
-    lab_store = 1
+    resNum = resIdEntry.get()
+    sampleID = sidEntry.get()
     insert_stmt = ("INSERT INTO Sequence(SequenceName, Sequence, ResearcherNumber, SampleID)"
                    "VALUES (?, ?, ?, ?)"
                    )
@@ -152,21 +162,17 @@ def submissionAl():
     #Creates the new output testing and training files
     for evLine in linesFile:
         if (evLine.count(">") != 0):
-            record = (def_line, sequence, mission, lab_store)
+            record = (def_line, sequence, resNum, sampleID)
             c.execute(insert_stmt, record)
 
             def_line = evLine[1:-1]
             sequence = ""
-        elif (evLine.count("!") != 0):
-            mission = evLine
-        elif  (evLine.count("*") != 0):
-            lab_store= evLine
         else:
             sequence = evLine
     connect.commit()
 
 #submission button
-submitButton = Button(root, text="Begin Trimming", command=submissionAl, pady=10)
+submitButton = Button(root, text="Upload Sequences", command=submissionAl, pady=10)
 submitButton.place(x=150, y=225)
 
 #Button to quite the program
