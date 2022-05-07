@@ -22,48 +22,154 @@ root.title("Alignment Selector")
 root.geometry('500x300')
 
 #Label and text entry for the name of the to-be-created training set
-Label(root, text="Enter the sequence you wish to search", font=('Calibri 10')).place(x=150,y=100)
+Label(root, text="Enter the protein you wish to search", font=('Calibri 10')).place(x=150,y=50)
 searchEntry = Entry(root, width= 40)
-searchEntry.place(x=75, y=125)
+searchEntry.place(x=75, y=75)
 
-#allows user to see the alignment in a fasta file
-def ResultViewer():
-    #variables must be declared global to properly function with Tkinter
-    global button
-    searchE = searchEntry.get()
+#Label and text entry for the name of the to-be-created training set
+Label(root, text="Enter the sequence you wish to search", font=('Calibri 10')).place(x=150,y=125)
+seqEntry = Entry(root, width= 40)
+seqEntry.place(x=75, y=150)
 
-    #Creates the secondary window where the alignment is displayed
-    rv = Toplevel(root)
-    rv.title("Viewing Sequence Results")
-    rv.geometry('800x600')
-    rv.configure(bg='green')
+def seqSearch():
+    qw = tkinter.Tk()
 
-    tree = ttk.Treeview(rv, column=("SeqID","SeqName","Seq","ResID","SID"), show='headings')
-    tree.column("SeqID", anchor=tkinter.CENTER)
-    tree.heading("SeqID", text="SequenceID")
-    tree.pack()
+    # Specifies basic aspects of the query window
+    qw.title("Query Result")
+    qw.configure(background='black')
+    width = 400
+    height = 300
+    qw.geometry(f'{width}x{height}')
 
-    #conduct query
-    searchQuery = ("""SELECT SequenceID FROM Sequence WHERE SequenceName = ?""")
-    c.execute(searchQuery, (searchE,))
-    searchResults = c.fetchall()
+    # closes the query
+    def Close():
+        qw.destroy()
 
-    for row in searchResults:
-        print(row)
-        tree.insert(row, tkinter.END, values=row)
+    # button to close the query window
+    CloseButton = Button(qw, text="Close", command=Close, padx=20, pady=10)
+    CloseButton.place(x=10, y=10)
 
-    button = Button(rv, text="Exit",command=rv.destroy)
-    button.pack()
+    try:
+        # execute any query from the queryBox
+        c.execute('SELECT * FROM Sequence WHERE Sequence= ?', (seqEntry.get(),))
+        des = [tuple[0] for tuple in c.description]
+        outputs = c.fetchall()
 
-    rv.mainloop()
+        # create table to display query
+        table_frame = Frame(qw)
+        table_frame.pack()
+        table_frame.place(x=10, y=60)
+        query_table = ttk.Treeview(table_frame)
+        query_table.pack()
+
+        # output any query into output box
+        query_table['columns'] = des
+        query_table.column("#0", width=0, stretch=NO)
+        width = 20
+        height = 150
+
+        # add columns to table and define width
+        # for every new column make window bigger
+        for head in des:
+            query_table.column(head, anchor=CENTER, width=100)
+            width += 100
+
+        # resize the window
+        qw.geometry(f'{width}x{height}')
+
+        # insert the column names into the table
+        query_table.heading("#0", text="", anchor=CENTER)
+        for head in des:
+            query_table.heading(head, text=head, anchor=CENTER)
+
+        # insert query into the table
+        # for every item inserted, make window taller
+        for x in range(len(outputs)):
+            query_table.insert(parent='', index='end', iid=x, text='', values=outputs[x])
+            height += 50
+
+        # resize the window
+        qw.geometry(f'{width}x{height}')
+    except:
+        Label(qw, text="Something wrong have occur", font=('Calibri 15'), bg='black').place(x=10, y=60)
+
+    qw.mainloop()
+
+def proteinSearch():
+    qw = tkinter.Tk()
+
+    # Specifies basic aspects of the query window
+    qw.title("Query Result")
+    qw.configure(background='black')
+    width = 400
+    height = 300
+    qw.geometry(f'{width}x{height}')
+
+    # closes the query
+    def Close():
+        qw.destroy()
+
+    # button to close the query window
+    CloseButton = Button(qw, text="Close", command=Close, padx=20, pady=10)
+    CloseButton.place(x=10, y=10)
+
+    try:
+        # execute any query from the queryBox
+        c.execute('SELECT * FROM Sequence WHERE SequenceName= ?', (searchEntry.get(),))
+        des = [tuple[0] for tuple in c.description]
+        outputs = c.fetchall()
+
+        # create table to display query
+        table_frame = Frame(qw)
+        table_frame.pack()
+        table_frame.place(x=10, y=60)
+        query_table = ttk.Treeview(table_frame)
+        query_table.pack()
+
+        # output any query into output box
+        query_table['columns'] = des
+        query_table.column("#0", width=0, stretch=NO)
+        width = 20
+        height = 150
+
+        # add columns to table and define width
+        # for every new column make window bigger
+        for head in des:
+            query_table.column(head, anchor=CENTER, width=100)
+            width += 100
+
+        # resize the window
+        qw.geometry(f'{width}x{height}')
+
+        # insert the column names into the table
+        query_table.heading("#0", text="", anchor=CENTER)
+        for head in des:
+            query_table.heading(head, text=head, anchor=CENTER)
+
+        # insert query into the table
+        # for every item inserted, make window taller
+        for x in range(len(outputs)):
+            query_table.insert(parent='', index='end', iid=x, text='', values=outputs[x])
+            height += 50
+
+        # resize the window
+        qw.geometry(f'{width}x{height}')
+    except:
+        Label(qw, text="Something wrong have occur", font=('Calibri 15'), bg='black').place(x=10, y=60)
+
+    qw.mainloop()
 
 #closes the program - destroys everything
 def close():
     root.destroy()
 
 #submission button
-searchButton = Button(root, text="SEarch up sequnce", command=ResultViewer, pady=10)
-searchButton.place(x=150, y=225)
+searchButton = Button(root, text="Search up protein", command=proteinSearch, pady=10)
+searchButton.place(x=150, y=200)
+
+#submission button
+searchButton = Button(root, text="Search up sequence", command=seqSearch, pady=10)
+searchButton.place(x=150, y=250)
 
 #Button to quite the program
 ExitButton = Button(root, text="Exit", command=close, pady=10)
@@ -71,14 +177,3 @@ ExitButton.place(x=0,y=0)
 
 #runs the program
 root.mainloop()
-
-"""
-tree.column("SeqName", anchor=tkinter.CENTER)
-    tree.heading("SeqName", text="Name")
-    tree.column("Seq", anchor=tkinter.CENTER)
-    tree.heading("Seq", text="Sequence")
-    tree.column("ResID", anchor=tkinter.CENTER)
-    tree.heading("ResID", text="ResearcherID")
-    tree.column("SID", anchor=tkinter.CENTER)
-    tree.heading("SID", text="SampleID")
-"""
