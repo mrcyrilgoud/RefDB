@@ -35,8 +35,7 @@ if os.path.exists('ProteinSequence.db'):
             LabName TEXT NOT NULL,
             LabZipCode INTEGER NOT NULL,
             LabState TEXT NOT NULL,
-            LabCity TEXT NOT NULL,
-            LabLockerLocation INTEGER NOT NULL
+            LabCity TEXT NOT NULL
         )""")
     # Create the Institution table
     c.execute("""
@@ -63,20 +62,21 @@ if os.path.exists('ProteinSequence.db'):
             ResearcherLastName TEXT NOT NULL,
             ResearcherReputation INTEGER NOT NULL,
             InstitutionID INTEGER NOT NULL,
-            MissionID INTEGER NOT NULL,
-            FOREIGN KEY(InstitutionID) REFERENCES Institution(InstitutionID),
-            FOREIGN KEY (MissionID) REFERENCES Mission(MissionID)
+            FOREIGN KEY(InstitutionID) REFERENCES Institution(InstitutionID)
         )""")
     # Create the Sample table
     c.execute("""
         CREATE TABLE Sample(
             SampleID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-            TimeSampled INTEGER NOT NULL,
+            DateSampled DATE NOT NULL,
+            TimeSampled TIME NOT NULL,
             SampleSource TEXT NOT NULL,
             SequenceOrganism TEXT NOT NULL,
             LabID INTEGER NOT NULL,
+            MissionID INTEGER NOT NULL,
             FOREIGN KEY (SequenceOrganism) REFERENCES Organism(SequenceOrganism),
-            FOREIGN KEY (LabID) REFERENCES Lab(LabID)
+            FOREIGN KEY (LabID) REFERENCES Lab(LabID),
+            FOREIGN KEY (MissionID) REFERENCES Mission(MissionID)
         )""")
     # Create the Sequence table
     c.execute("""
@@ -98,15 +98,13 @@ if os.path.exists('ProteinSequence.db'):
 root = tkinter.Tk()
 
 #Specifies basic aspects of the main window
-root.title("Alignment Selector")
+root.title("DB uploader")
 root.geometry('500x300')
 
-#Label and text entry for the name of the to-be-created training set
 Label(root, text="Enter the researcher number", font=('Calibri 10')).place(x=150,y=50)
 resIdEntry = Entry(root, width= 40)
 resIdEntry.place(x=75, y=75)
 
-#Label and text entry for the name of the to-be-created training set
 Label(root, text="Enter the sample ID ", font=('Calibri 10')).place(x=150,y=125)
 sidEntry = Entry(root, width= 40)
 sidEntry.place(x=75, y=150)
@@ -148,9 +146,6 @@ def submissionAl():
     if(seqLine != ""):
         linesFile.append(seqLine)
 
-    if (linesFile[0].count(">") == 0):
-        linesFile.pop(0)
-
     def_line=""
     sequence = ""
     resNum = resIdEntry.get()
@@ -175,7 +170,7 @@ def submissionAl():
 submitButton = Button(root, text="Upload Sequences", command=submissionAl, pady=10)
 submitButton.place(x=150, y=225)
 
-#Button to quite the program
+#Button to quit the program
 ExitButton = Button(root, text="Exit", command=close, pady=10)
 ExitButton.place(x=0,y=0)
 

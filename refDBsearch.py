@@ -9,7 +9,7 @@ import os
 # Importing sqlite3
 import sqlite3
 
-# Create the 'ProteinSequence.db' file
+# Connect to the 'ProteinSequence.db' file
 connect = sqlite3.connect('ProteinSequence.db')
 c = connect.cursor()
 
@@ -18,15 +18,13 @@ c = connect.cursor()
 root = tkinter.Tk()
 
 #Specifies basic aspects of the main window
-root.title("Alignment Selector")
+root.title("DB Searcher")
 root.geometry('500x300')
 
-#Label and text entry for the name of the to-be-created training set
 Label(root, text="Enter the protein you wish to search", font=('Calibri 10')).place(x=150,y=50)
 searchEntry = Entry(root, width= 40)
 searchEntry.place(x=75, y=75)
 
-#Label and text entry for the name of the to-be-created training set
 Label(root, text="Enter the sequence you wish to search", font=('Calibri 10')).place(x=150,y=125)
 seqEntry = Entry(root, width= 40)
 seqEntry.place(x=75, y=150)
@@ -163,15 +161,13 @@ def proteinSearch():
 def close():
     root.destroy()
 
-#submission button
 searchButton = Button(root, text="Search up protein", command=proteinSearch, pady=10)
 searchButton.place(x=150, y=200)
 
-#submission button
 searchButton = Button(root, text="Search up sequence", command=seqSearch, pady=10)
 searchButton.place(x=150, y=250)
 
-#Button to quite the program
+#Button to quit the program
 ExitButton = Button(root, text="Exit", command=close, pady=10)
 ExitButton.place(x=0,y=0)
 
